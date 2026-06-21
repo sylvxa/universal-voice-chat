@@ -1,0 +1,59 @@
+{
+  "uvc.name.short": "Voice Chat",
+  "menu.uvc.edit": "Configure",
+  "menu.uvc.settings": "Settings",
+  "menu.uvc.setup": "Voice Chat Setup",
+  "menu.uvc.setup.friend": "If your friend gave you an application ID (or you think they should've), input it here.",
+  "menu.uvc.setup.alone": "Otherwise, follow the %s guide though Step 3, and put the ID here.",
+
+  "menu.uvc.settings.long": "Voice Chat Settings",
+
+  "menu.uvc.lobby.secret": "Lobby Secret",
+  "menu.uvc.lobby.join": "Join Lobby",
+  "menu.uvc.lobby.title": "Lobby (%s)",
+  "menu.uvc.lobby.status.connected": "Connected, %s user%s",
+
+  "menu.uvc.settings.audio": "Audio",
+  "menu.uvc.setting.input": "Input",
+  "menu.uvc.setting.input_volume": "Input Volume: %s",
+  "menu.uvc.setting.output": "Output",
+  "menu.uvc.setting.output_volume": "Output Volume: %s",
+  "menu.uvc.setting.noise_dampening": "Noise Dampening",
+
+  "menu.uvc.settings.visual": "Visual",
+  "menu.uvc.settings.overlay": "Overlay",
+  "menu.uvc.settings.hide_in_game": "Hide In-Game",
+
+  "menu.uvc.settings.discord": "Discord",
+  "menu.uvc.settings.application_id": "Application ID",
+
+  "menu.uvc.config.long": "Lobby Settings",
+  "menu.uvc.config.range": "Hearing Range: %s",
+
+  "text.uvc.connecting": "Check Discord...",
+
+  "text.uvc.leaving": "Leaving lobby...",
+  "text.uvc.joining": "Joining lobby...",
+
+  "text.uvc.mute": "Toggle Mute",
+  "text.uvc.deaf": "Toggle Deafen",
+  "text.uvc.exit": "Leave Lobby",
+
+  "text.uvc.coming_soon": "coming soon ;|",
+
+  "error.uvc.not_ready": "Discord client is not ready!",
+  "error.uvc.no_connect": "Error while connecting to Discord",
+  "error.uvc.no_connect.message": "There was an error while connecting to Discord. Would you like to try re-inputting your application ID?",
+
+  "error.uvc.details": "Error Details",
+
+  "toast.uvc.join": "Successfully joined lobby!",
+  "toast.uvc.join.error": "Could not join lobby!",
+
+  "commands.uvc.create": "Created voice chat lobby! Tell your friends to run: %s",
+  "commands.uvc.error.create": "Could not create lobby: %s",
+  "commands.uvc.join": "Joined voice chat lobby!",
+  "commands.uvc.error.join": "Could not join lobby: %s",
+  "commands.uvc.leave": "Left voice chat lobby!",
+  "commands.uvc.error.leave": "Could not leave lobby: %s"
+}

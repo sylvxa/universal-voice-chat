@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "universalvc",
+	"version": "${version}",
+	"name": "Universal Voice Chat",
+	"description": "Discord-powered proximity voice chat that works without relying on a server.",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/universalvc/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"lol.sylvie.universalvc.UniversalVoiceChat"
+		]
+	},
+	"mixins": [
+		"universalvc.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
