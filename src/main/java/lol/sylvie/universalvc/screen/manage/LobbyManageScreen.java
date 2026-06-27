@@ -24,7 +24,7 @@ public class LobbyManageScreen extends AbstractConfigurationScreen {
     @Override
     protected void addSettings(LinearLayout settings, int width) {
         for (VoiceParticipant participant : LobbyHandler.participantMap.values()) {
-            if (participant.getProfile().id().equals(Minecraft.getInstance().getGameProfile().id())) return;
+            if (participant.getProfile().id().equals(Minecraft.getInstance().getGameProfile().id())) continue;
 
             GameProfile profile = participant.getProfile();
             Component icon = Component.object(new PlayerSprite(ResolvableProfile.createUnresolved(profile.id()), true)).withoutShadow();

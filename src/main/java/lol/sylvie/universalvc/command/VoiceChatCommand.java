@@ -4,6 +4,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import lol.sylvie.universalvc.UniversalVoiceChat;
+import lol.sylvie.universalvc.sdk.DiscordHandler;
 import lol.sylvie.universalvc.util.Result;
 import lol.sylvie.universalvc.voice.LobbyHandler;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -16,6 +18,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jspecify.annotations.NonNull;
+
+import java.util.function.Predicate;
 
 public class VoiceChatCommand {
     private static void sendResult(CommandContext<FabricClientCommandSource> context, String successKey, String errorKey, Result result) {
@@ -30,6 +34,7 @@ public class VoiceChatCommand {
 
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext ctx) {
         LiteralArgumentBuilder<FabricClientCommandSource> root = ClientCommands.literal("uvc");
+        root.requires(_ -> !UniversalVoiceChat.isUnavailable());
 
         LiteralArgumentBuilder<FabricClientCommandSource> create = commandCreate();
         root.then(create);

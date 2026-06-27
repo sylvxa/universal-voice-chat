@@ -10,6 +10,7 @@ import lol.sylvie.universalvc.voice.LobbyHandler;
 import lol.sylvie.universalvc.voice.VoiceKeybinds;
 import net.fabricmc.api.ClientModInitializer;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,17 +56,17 @@ public class UniversalVoiceChat implements ClientModInitializer {
 		VoiceChatCommand.init();
 		VoiceKeybinds.init();
 
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			if (DISCORD_HANDLER != null) {
-				if (LobbyHandler.call != null) {
-					LobbyHandler.leave((_) -> {
-						DISCORD_HANDLER.stop(() -> {});
-					});
-				} else {
-					DISCORD_HANDLER.stop(() -> {});
-				}
-			}
-		}));
+		ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> {
+            if (DISCORD_HANDLER != null) {
+                if (LobbyHandler.call != null) {
+                    LobbyHandler.leave((_) -> {
+                        DISCORD_HANDLER.stop(() -> {});
+                    });
+                } else {
+                    DISCORD_HANDLER.stop(() -> {});
+                }
+            }
+        });
 	}
 
 	public static boolean isUnavailable() {

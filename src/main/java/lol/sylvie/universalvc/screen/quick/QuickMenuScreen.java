@@ -43,10 +43,12 @@ public class QuickMenuScreen extends ImageBackedScreen {
 
     public static void refresh() {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.gui.screen() instanceof QuickMenuScreen) // refresh
-            minecraft.gui.setScreen(new QuickMenuScreen());
-        else if (minecraft.gui.screen() instanceof LobbyManageScreen)
-            LobbyManageScreen.refresh();
+        minecraft.execute(() -> {
+            if (minecraft.gui.screen() instanceof QuickMenuScreen) // refresh
+                minecraft.gui.setScreen(new QuickMenuScreen());
+            else if (minecraft.gui.screen() instanceof LobbyManageScreen)
+                LobbyManageScreen.refresh();
+        });
     }
 
     @Override

@@ -2,6 +2,8 @@ package lol.sylvie.universalvc.mixin;
 
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import lol.sylvie.universalvc.util.ModIcons;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// See https://github.com/TerraformersMC/ModMenu/blob/26.2/src/main/java/com/terraformersmc/modmenu/mixin/MixinTitleScreen.java
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
     protected TitleScreenMixin(Component title) {
@@ -24,10 +27,15 @@ public abstract class TitleScreenMixin extends Screen {
     @Shadow
     protected abstract int getHorizontalPosition(int currentButton, int numberOfButtons, int buttonWidth);
 
+    @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/TitleScreen;getHorizontalPosition(III)I"))
+    private int uvc$fixButtons(TitleScreen instance, int currentButton, int hardcoded, int buttonWidth, Operation<Integer> original, @Local(name = "numberOfButtons") int numberOfButtons) {
+        return original.call(instance, currentButton, numberOfButtons, buttonWidth);
+    }
+
     @Definition(id = "numberOfButtons", local = @Local(type = int.class, name = "numberOfButtons"))
     @Expression("numberOfButtons = ?")
     @Inject(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER))
-    private void adjustAmountOfIconButtons(CallbackInfo ci, @Local(name = "numberOfButtons") LocalIntRef numberOfButtons) {
+    private void uvc$changeButtonNumber(CallbackInfo ci, @Local(name = "numberOfButtons") LocalIntRef numberOfButtons) {
         numberOfButtons.set(numberOfButtons.get() + 1);
     }
 
