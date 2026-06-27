@@ -3,9 +3,10 @@ package lol.sylvie.universalvc;
 import lol.sylvie.universalvc.command.VoiceChatCommand;
 import lol.sylvie.universalvc.screen.settings.ModSettings;
 import lol.sylvie.universalvc.sdk.DiscordHandler;
-import lol.sylvie.universalvc.util.DistanceTracker;
+import lol.sylvie.universalvc.voice.AudioFader;
 import lol.sylvie.universalvc.util.NativeHelper;
 import lol.sylvie.universalvc.util.Result;
+import lol.sylvie.universalvc.voice.LobbyHandler;
 import lol.sylvie.universalvc.voice.VoiceKeybinds;
 import net.fabricmc.api.ClientModInitializer;
 
@@ -50,9 +51,21 @@ public class UniversalVoiceChat implements ClientModInitializer {
 		NativeHelper.load();
 		MOD_SETTINGS = ModSettings.load();
 
-		DistanceTracker.init();
+		AudioFader.init();
 		VoiceChatCommand.init();
 		VoiceKeybinds.init();
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			if (DISCORD_HANDLER != null) {
+				if (LobbyHandler.call != null) {
+					LobbyHandler.leave((_) -> {
+						DISCORD_HANDLER.stop(() -> {});
+					});
+				} else {
+					DISCORD_HANDLER.stop(() -> {});
+				}
+			}
+		}));
 	}
 
 	public static boolean isUnavailable() {

@@ -7,7 +7,6 @@ import lol.sylvie.universalvc.UniversalVoiceChat;
 import lol.sylvie.universalvc.screen.quick.QuickMenuScreen;
 import lol.sylvie.universalvc.sdk.DiscordHandler;
 import lol.sylvie.universalvc.util.NativeHelper;
-import lol.sylvie.universalvc.util.DistanceTracker;
 import lol.sylvie.universalvc.util.Result;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
@@ -58,25 +57,7 @@ public class LobbyHandler {
                 LobbyHandler.call = Discord_Call.allocate(arena);
 
                 // Fade audio
-                Discord_Client_UserAudioReceivedCallback.Function modifyAudio = (userId, data, samplesPerChannel, sampleRate, channels, outShouldMute, userData1) -> {
-                    if (!DistanceTracker.isInGame) return;
-
-                    long totalSamples = samplesPerChannel * channels;
-                    MemorySegment audioBuffer = data.reinterpret(totalSamples * ValueLayout.JAVA_SHORT.byteSize());
-
-                    GameProfile gameProfile = participantMap.get(userId).getProfile();
-                    float factor = DistanceTracker.distances.getOrDefault(gameProfile.id(), 1f);
-
-                    if (factor == 0) {
-                        outShouldMute.reinterpret(ValueLayout.JAVA_BOOLEAN.byteSize()).set(ValueLayout.JAVA_BOOLEAN, 0, true);
-                        return;
-                    }
-
-                    for (long i = 0; i < totalSamples; i++) {
-                        short sample = audioBuffer.getAtIndex(ValueLayout.JAVA_SHORT, i);
-                        audioBuffer.setAtIndex(ValueLayout.JAVA_SHORT, i, (short)(sample * factor));
-                    }
-                };
+                Discord_Client_UserAudioReceivedCallback.Function modifyAudio = new AudioHandler();
 
                 MemorySegment client = discord.getClient();
                 MemorySegment receiveCallback = Discord_Client_UserAudioReceivedCallback.allocate(modifyAudio, arena);
@@ -127,24 +108,17 @@ public class LobbyHandler {
 
                 // Voice state updates
                 Discord_Call_SetSpeakingStatusChangedCallback(call, Discord_Call_OnSpeakingStatusChanged.allocate((userId, isPlayingSound, _) -> {
-                    participantMap.get(userId).setSpeaking(isPlayingSound);
+                    VoiceParticipant participant = participantMap.get(userId);
+                    if (participant != null) participant.setSpeaking(isPlayingSound);
                 }, arena), MemorySegment.NULL, MemorySegment.NULL);
 
                 Discord_Call_SetOnVoiceStateChangedCallback(call, Discord_Call_OnVoiceStateChanged.allocate((userId, _) -> {
-                    participantMap.get(userId).updateVoiceState(call);
-                    if (userId == UniversalVoiceChat.DISCORD_HANDLER.getUserId()) {
-                        minecraft.execute(() -> {
-                            if (minecraft.gui.screen() instanceof QuickMenuScreen) // refresh
-                                minecraft.gui.setScreen(new QuickMenuScreen());
-                        });
-                    }
-                }, arena), MemorySegment.NULL, MemorySegment.NULL);
+                    VoiceParticipant participant = participantMap.get(userId);
+                    if (participant != null) participant.updateVoiceState(call);
+                    if (userId == UniversalVoiceChat.DISCORD_HANDLER.getUserId())
+                        QuickMenuScreen.refresh();
 
-                // Set range
-                MemorySegment properties = Discord_Properties.allocate(arena);
-                Discord_LobbyHandle_Metadata(lobbyHandle, properties);
-                Map<String, String> lobbyProperties = NativeHelper.readDiscordProperties(properties);
-                DistanceTracker.maxRange = Integer.parseInt(lobbyProperties.getOrDefault("range", "4"));
+                }, arena), MemorySegment.NULL, MemorySegment.NULL);
             }
 
             minecraft.execute(() -> {
@@ -200,17 +174,5 @@ public class LobbyHandler {
             }
             callback.accept(result);
         });
-    }
-
-    public void setRange(int range) {
-        Arena arena = UniversalVoiceChat.DISCORD_HANDLER.getArena();
-        MemorySegment lobbyProperties = Discord_Properties.allocate(arena);
-        Discord_LobbyHandle_Metadata(lobbyHandle, lobbyProperties);
-
-        MemorySegment blank = Discord_Client_CreateOrJoinLobbyCallback.allocate((_, _, _) -> {}, arena);
-
-        //Discord_Client_CreateOrJoinLobbyWithMetadata(UniversalVoiceChat.DISCORD_HANDLER.getClient(), NativeHelper.writeDiscordString(LobbyHandler.secret, arena), lobbyProperties, MemorySegment.NULL, blank, MemorySegment.NULL, MemorySegment.NULL);
-
-        //Discord_Client_SendLobbyMessage(UniversalVoiceChat.DISCORD_HANDLER.getClient());
     }
 }

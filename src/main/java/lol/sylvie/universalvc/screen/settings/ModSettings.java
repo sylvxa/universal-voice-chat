@@ -9,6 +9,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.*;
 
 public class ModSettings {
+    public int hearingRange = 24;
+
     public String applicationId = "";
     public boolean renderOverlay = true;
     public boolean overlayOnlyInMenus = true;

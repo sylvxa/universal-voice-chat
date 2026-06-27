@@ -1,11 +1,12 @@
 package lol.sylvie.universalvc.screen.settings;
 
 import lol.sylvie.universalvc.UniversalVoiceChat;
+import lol.sylvie.universalvc.screen.util.AbstractConfigurationScreen;
 import lol.sylvie.universalvc.screen.quick.QuickMenuScreen;
+import lol.sylvie.universalvc.screen.util.SimpleSlider;
 import lol.sylvie.universalvc.sdk.AudioDevice;
 import lol.sylvie.universalvc.sdk.DiscordHandler;
 import lol.sylvie.universalvc.sdk.NoiseDampenMode;
-import lol.sylvie.universalvc.util.DistanceTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -20,10 +21,11 @@ import java.util.concurrent.ExecutionException;
 
 public class VoiceSettingsScreen extends AbstractConfigurationScreen {
     private List<AudioDevice> inputs;
-    private String currentInput;
+    private AudioDevice currentInput;
     private List<AudioDevice> outputs;
-    private String currentOutput;
-    protected VoiceSettingsScreen(List<AudioDevice> inputs, String currentInput, List<AudioDevice> outputs, String currentOutput) {
+    private AudioDevice currentOutput;
+
+    protected VoiceSettingsScreen(List<AudioDevice> inputs, AudioDevice currentInput, List<AudioDevice> outputs, AudioDevice currentOutput) {
         super(Component.translatable("menu.uvc.settings.long"));
         this.inputs = inputs;
         this.currentInput = currentInput;
@@ -37,9 +39,9 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
         }
 
         CompletableFuture<List<AudioDevice>> inputs = UniversalVoiceChat.DISCORD_HANDLER.getInputs();
-        CompletableFuture<String> currentInput = UniversalVoiceChat.DISCORD_HANDLER.getCurrentInput();
+        CompletableFuture<AudioDevice> currentInput = UniversalVoiceChat.DISCORD_HANDLER.getCurrentInput();
         CompletableFuture<List<AudioDevice>> outputs = UniversalVoiceChat.DISCORD_HANDLER.getOutputs();
-        CompletableFuture<String> currentOutput = UniversalVoiceChat.DISCORD_HANDLER.getCurrentOutput();
+        CompletableFuture<AudioDevice> currentOutput = UniversalVoiceChat.DISCORD_HANDLER.getCurrentOutput();
 
 
         CompletableFuture.allOf(inputs, currentInput, outputs, currentOutput).join();
@@ -52,8 +54,12 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
         }
     }
 
-    private AudioDevice search(String id, List<AudioDevice> devices) {
-        return devices.stream().filter(d -> d.id().equals(id)).findAny().orElseThrow();
+    private AudioDevice search(AudioDevice device, List<AudioDevice> devices) {
+        // On my machine, the current device ID is *always* "default" for some reason
+        List<AudioDevice> named = devices.stream().filter(d -> d.name().equals(device.name()) && !d.id().equals("default")).toList();
+        if (named.size() == 1) return named.getFirst();
+
+        return devices.stream().filter(d -> d.id().equals(device.id())).findAny().orElseThrow();
     }
 
     private CycleButton<AudioDevice> inputCycler;
@@ -73,6 +79,7 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
 
         this.inputCycler = CycleButton.builder(AudioDevice::asComponent, search(currentInput, inputs))
                 .withValues(inputs)
+                .withTooltip(device -> Tooltip.create(device.asComponent()))
                 .create(0, 0, width, 20, Component.translatable("menu.uvc.setting.input"));
         settings.addChild(this.inputCycler);
 
@@ -81,6 +88,7 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
 
         this.outputCycler = CycleButton.builder(AudioDevice::asComponent, search(currentOutput, outputs))
                 .withValues(outputs)
+                .withTooltip(device -> Tooltip.create(device.asComponent()))
                 .create(0, 0, width, 20, Component.translatable("menu.uvc.setting.output"));
         settings.addChild(this.outputCycler);
 
@@ -92,7 +100,7 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
                 .create(0, 0, width, 20, Component.translatable("menu.uvc.setting.noise_dampening"));
         settings.addChild(this.noiseDampen);
 
-        this.range = new SimpleSlider(width, 20, "menu.uvc.config.range", 4, 128, DistanceTracker.maxRange, new DecimalFormat("0 blocks"));
+        this.range = new SimpleSlider(width, 20, "menu.uvc.config.range", 4, 128, UniversalVoiceChat.MOD_SETTINGS.hearingRange, new DecimalFormat("0 blocks"));
         settings.addChild(this.range);
 
         addHeader(settings, Component.translatable("menu.uvc.settings.visual"));
@@ -135,9 +143,9 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
         handler.setOutputVolume(this.outputVolume.getRealValue());
         handler.setNoiseDampening(this.noiseDampen.getValue());
 
-        DistanceTracker.maxRange = (int) this.range.getRealValue();
-
         ModSettings settings = UniversalVoiceChat.MOD_SETTINGS;
+
+        settings.hearingRange = (int) this.range.getRealValue();
 
         settings.renderOverlay = overlayToggle.getValue();
         settings.overlayOnlyInMenus = inGameToggle.getValue();
@@ -161,6 +169,6 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
 
     @Override
     public void onClose() {
-        Minecraft.getInstance().gui.setScreen(new QuickMenuScreen());
+        minecraft.gui.setScreen(new QuickMenuScreen());
     }
 }

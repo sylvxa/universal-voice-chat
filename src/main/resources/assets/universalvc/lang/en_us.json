@@ -1,6 +1,6 @@
 {
   "uvc.name.short": "Voice Chat",
-  "menu.uvc.edit": "Configure",
+
   "menu.uvc.settings": "Settings",
   "menu.uvc.setup": "Voice Chat Setup",
   "menu.uvc.setup.friend": "If your friend gave you an application ID (or you think they should've), input it here.",
@@ -29,6 +29,10 @@
 
   "menu.uvc.config.long": "Lobby Settings",
   "menu.uvc.config.range": "Hearing Range: %s",
+
+  "menu.uvc.manage": "Manage",
+  "menu.uvc.manage.long": "Manage Lobby",
+  "menu.uvc.manage.volume": "Volume: %s",
 
   "text.uvc.connecting": "Check Discord...",
 

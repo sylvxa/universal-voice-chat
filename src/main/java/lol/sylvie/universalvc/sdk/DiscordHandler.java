@@ -207,13 +207,11 @@ public class DiscordHandler {
         return future;
     }
 
-    public CompletableFuture<String> getCurrentInput() {
-        CompletableFuture<String> future = new CompletableFuture<>();
+    public CompletableFuture<AudioDevice> getCurrentInput() {
+        CompletableFuture<AudioDevice> future = new CompletableFuture<>();
 
         Discord_Client_GetCurrentInputDevice(client, Discord_Client_GetCurrentInputDeviceCallback.allocate((device, _) -> {
-            MemorySegment id = Discord_String.allocate(arena);
-            Discord_AudioDevice_Id(device, id);
-            future.complete(NativeHelper.readDiscordString(id));
+            future.complete(AudioDevice.fromDiscord(arena, device));
         }, arena), MemorySegment.NULL, MemorySegment.NULL);
 
         return future;
@@ -239,13 +237,11 @@ public class DiscordHandler {
         return future;
     }
 
-    public CompletableFuture<String> getCurrentOutput() {
-        CompletableFuture<String> future = new CompletableFuture<>();
+    public CompletableFuture<AudioDevice> getCurrentOutput() {
+        CompletableFuture<AudioDevice> future = new CompletableFuture<>();
 
         Discord_Client_GetCurrentOutputDevice(client, Discord_Client_GetCurrentOutputDeviceCallback.allocate((device, _) -> {
-            MemorySegment id = Discord_String.allocate(arena);
-            Discord_AudioDevice_Id(device, id);
-            future.complete(NativeHelper.readDiscordString(id));
+            future.complete(AudioDevice.fromDiscord(arena, device));
         }, arena), MemorySegment.NULL, MemorySegment.NULL);
 
         return future;

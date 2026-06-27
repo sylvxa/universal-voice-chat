@@ -1,7 +1,6 @@
-package lol.sylvie.universalvc.screen.settings;
+package lol.sylvie.universalvc.screen.util;
 
 import lol.sylvie.universalvc.UniversalVoiceChat;
-import lol.sylvie.universalvc.screen.ImageBackedScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ScrollableLayout;
@@ -11,22 +10,27 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
 
 public abstract class AbstractConfigurationScreen extends ImageBackedScreen {
     public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 24, 24);
+    private final boolean noSave;
+
+    protected AbstractConfigurationScreen(Component title, boolean noSave) {
+        super(title, UniversalVoiceChat.id("settings/background"), 208, 224, 256);
+        this.noSave = noSave;
+    }
 
     protected AbstractConfigurationScreen(Component title) {
-        super(title, UniversalVoiceChat.id("settings/background"), 208, 224, 256);
+        this(title, false);
     }
 
     protected void addHeader(LinearLayout settings, MutableComponent component) {
         settings.addChild(new StringWidget(width, 11, component.withStyle(ChatFormatting.BOLD), font));
     }
 
-    abstract void addSettings(LinearLayout settings, int width);
+    protected abstract void addSettings(LinearLayout settings, int width);
 
-    abstract void saveAndExit();
+    protected abstract void saveAndExit();
 
     @Override
     protected void init() {
@@ -52,13 +56,15 @@ public abstract class AbstractConfigurationScreen extends ImageBackedScreen {
         LinearLayout buttons = LinearLayout.horizontal().spacing(spacing);
         buttons.setPosition(this.guiX + margin, this.guiY + this.bgHeight - margin - 20);
 
-        int buttonCount = 2;
+        int buttonCount = noSave ? 1 : 2;
         int buttonWidth = ((widthNoMargin - (spacing * (buttonCount - 1))) / buttonCount);
 
         Button closeButton = Button.builder(CommonComponents.GUI_BACK, _ -> this.onClose()).size(buttonWidth, 20).build();
         buttons.addChild(closeButton);
-        Button saveButton = Button.builder(CommonComponents.GUI_DONE, _ -> saveAndExit()).size(buttonWidth, 20).build();
-        buttons.addChild(saveButton);
+        if (!noSave) {
+            Button saveButton = Button.builder(CommonComponents.GUI_DONE, _ -> saveAndExit()).size(buttonWidth, 20).build();
+            buttons.addChild(saveButton);
+        }
 
         buttons.visitWidgets(this::addRenderableWidget);
         buttons.arrangeElements();

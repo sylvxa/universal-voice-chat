@@ -5,15 +5,23 @@
 	"name": "Universal Voice Chat",
 	"description": "Discord-powered proximity voice chat that works without relying on a server.",
 	"authors": [
-		"Me!"
+		{
+			"name": "sylvxa",
+			"contact": {
+				"email": "me@sylvie.lol",
+				"homepage": "https://sylvie.lol"
+			}
+		}
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"repo": "https://github.com/sylvxa/universal-voice-chat",
+		"homepage": "https://modrinth.com/mod/uvc",
+		"issues": "https://github.com/sylvxa/universal-voice-chat/issues",
+		"discord": "https://discord.gg/5qzrB98sBA"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/universalvc/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"client": [
 			"lol.sylvie.universalvc.UniversalVoiceChat"

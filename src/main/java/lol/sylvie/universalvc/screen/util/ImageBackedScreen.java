@@ -1,6 +1,5 @@
-package lol.sylvie.universalvc.screen;
+package lol.sylvie.universalvc.screen.util;
 
-import lol.sylvie.universalvc.UniversalVoiceChat;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;

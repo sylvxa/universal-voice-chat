@@ -1,21 +1,12 @@
 package lol.sylvie.universalvc.util;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTextures;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.yggdrasil.response.FriendsListResponse;
 import lol.sylvie.universalvc.UniversalVoiceChat;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.friends.FriendsOverlayScreen;
-import net.minecraft.client.resources.DefaultPlayerSkin;
+import lol.sylvie.universalvc.screen.quick.QuickMenuScreen;
+import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.Services;
-import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
-
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
 
 public class ModIcons {
     public static final Identifier MUTED = UniversalVoiceChat.id("status/muted");
@@ -25,15 +16,12 @@ public class ModIcons {
 
     public static final Identifier EXIT = UniversalVoiceChat.id("action/exit");
 
-    private static HashMap<UUID, PlayerSkin> skins = new HashMap<>();
 
-    public static PlayerSkin getSkin(GameProfile profile) {
-        UUID uuid = profile.id();
-        if (skins.containsKey(uuid)) {
-            return skins.get(uuid);
-        }
-
-        skins.put(uuid, DefaultPlayerSkin.get(uuid));
-        return skins.get(uuid);
+    public static SpriteIconButton getMenuButton(Screen previous) {
+        return SpriteIconButton.builder(Component.translatable("uvc.name.short"), _ -> QuickMenuScreen.tryOpen(previous), true)
+                .sprite(UniversalVoiceChat.id("status/unmuted"), 16, 16)
+                .size(20, 20)
+                .withTootip()
+                .build();
     }
 }

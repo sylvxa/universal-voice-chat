@@ -4,7 +4,9 @@ Discord-powered proximity voice chat that works without relying on a server.
 
 ## Notes
 
-This mod is a bit of a proof-of-concept. If you are looking for something to use on your server, use [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) or [Plasmo Voice](https://modrinth.com/mod/plasmo-voice)— they will probably work better there.
+This mod is a bit of a proof-of-concept. If you are looking for something to use on your server, use [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) or [Plasmo Voice](https://modrinth.com/mod/plasmo-voice)— they will work better there.
+
+
 
 ## Building
 

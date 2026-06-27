@@ -25,7 +25,7 @@ import static com.discord.cdiscord_h.Discord_AudioDevice_Id;
 import static com.discord.cdiscord_h.Discord_AudioDevice_Name;
 
 public class NativeHelper {
-    public static Path copyResourceDirToTemp(String resourcePath) {
+    private static Path copyResourceDirToTemp(String resourcePath) {
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             URL url = classLoader.getResource(resourcePath);
@@ -36,14 +36,12 @@ public class NativeHelper {
             Path tempDir = Files.createTempDirectory("uvc-");
             URI uri = url.toURI();
 
-            if ("jar".equals(uri.getScheme())) {
-                // Resource lives inside a JAR — mount it as a filesystem to walk it.
+            if (uri.getScheme().equals("jar")) {
                 try (FileSystem jarFs = FileSystems.newFileSystem(uri, Map.of())) {
                     Path source = jarFs.getPath(resourcePath);
                     copyDirectory(source, tempDir);
                 }
             } else {
-                // Resource lives on the regular filesystem (exploded classes dir).
                 Path source = Path.of(uri);
                 copyDirectory(source, tempDir);
             }
@@ -81,8 +79,8 @@ public class NativeHelper {
         if (Platform.isWindows()) {
             String armPrefix = (arm ? "arm64/" : "");
             String sdkName = armPrefix + "discord_partner_sdk.dll";
-            //String krispName = armPrefix + "discord_krisp.dll";
-            return List.of(sdkName);
+            String krispName = armPrefix + "discord_krisp.dll";
+            return List.of(sdkName, krispName);
         } else if (Platform.isMac()) {
             return List.of("libdiscord_partner_sdk.dylib", "libdiscord_krisp.dylib");
         } else if (Platform.isLinux()) {
@@ -185,13 +183,8 @@ public class NativeHelper {
         ArrayList<AudioDevice> audioDevices = new ArrayList<>();
         for (long i = 0; i < deviceCount; i++) {
             MemorySegment device = devicesArray.asSlice(i * deviceSize, deviceSize);
-
-            MemorySegment id = Discord_String.allocate(arena);
-            Discord_AudioDevice_Id(device, id);
-            MemorySegment name = Discord_String.allocate(arena);
-            Discord_AudioDevice_Name(device, name);
-
-            audioDevices.add(new AudioDevice(NativeHelper.readDiscordString(id), NativeHelper.readDiscordString(name)));
+            AudioDevice read = AudioDevice.fromDiscord(arena, device);
+            audioDevices.add(read);
         }
         return audioDevices;
     }

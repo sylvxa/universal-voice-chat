@@ -1,4 +1,4 @@
-package lol.sylvie.universalvc.screen.settings;
+package lol.sylvie.universalvc.screen.util;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;

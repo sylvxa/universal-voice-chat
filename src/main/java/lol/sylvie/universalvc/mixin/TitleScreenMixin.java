@@ -2,13 +2,9 @@ package lol.sylvie.universalvc.mixin;
 
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import lol.sylvie.universalvc.UniversalVoiceChat;
-import lol.sylvie.universalvc.screen.quick.QuickMenuScreen;
-import net.minecraft.client.gui.components.Button;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import lol.sylvie.universalvc.util.ModIcons;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -28,19 +24,18 @@ public abstract class TitleScreenMixin extends Screen {
     @Shadow
     protected abstract int getHorizontalPosition(int currentButton, int numberOfButtons, int buttonWidth);
 
-    @WrapMethod(method = "getHorizontalPosition")
-    public int uvc$addRoomForButton(int currentButton, int numberOfButtons, int buttonWidth, Operation<Integer> original) {
-        return original.call(currentButton, numberOfButtons + 1, buttonWidth);
+    @Definition(id = "numberOfButtons", local = @Local(type = int.class, name = "numberOfButtons"))
+    @Expression("numberOfButtons = ?")
+    @Inject(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER))
+    private void adjustAmountOfIconButtons(CallbackInfo ci, @Local(name = "numberOfButtons") LocalIntRef numberOfButtons) {
+        numberOfButtons.set(numberOfButtons.get() + 1);
     }
 
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/SpriteIconButton;setPosition(II)V", ordinal = 1))
-    public void uvc$addVcButton(CallbackInfo ci, @Local(name = "currentButton") int currentButton, @Local(name = "topPos") int topPos) {
-        SpriteIconButton button = SpriteIconButton.builder(Component.translatable("uvc.name.short"), _ -> QuickMenuScreen.tryOpen(this), true)
-                .sprite(UniversalVoiceChat.id("status/unmuted"), 16, 16)
-                .size(20, 20)
-                .build();
-        ++currentButton;
-        button.setPosition(getHorizontalPosition(currentButton, 3, 20), topPos);
+    public void uvc$addVcButton(CallbackInfo ci, @Local(name = "currentButton") LocalIntRef currentButton, @Local(name = "topPos") int topPos, @Local(name = "numberOfButtons") int numberOfButtons) {
+        SpriteIconButton button = ModIcons.getMenuButton(this);
+        currentButton.set(currentButton.get() + 1);
+        button.setPosition(getHorizontalPosition(currentButton.get(), numberOfButtons, 20), topPos);
         addRenderableWidget(button);
     }
 }

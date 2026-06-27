@@ -12,7 +12,9 @@
     "requireAnnotations": true
   },
   "client": [
+    "PauseScreenMixin",
     "TitleScreenMixin"
   ],
-  "mixinextras": {"minVersion": "0.5.4"}
+  "mixinextras": {
+    "minVersion": "0.5.4"}
 }

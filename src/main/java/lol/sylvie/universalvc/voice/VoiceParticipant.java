@@ -3,6 +3,10 @@ package lol.sylvie.universalvc.voice;
 import com.discord.Discord_VoiceStateHandle;
 import com.mojang.authlib.GameProfile;
 import lol.sylvie.universalvc.UniversalVoiceChat;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.PlayerSkinRenderCache;
+import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.world.item.component.ResolvableProfile;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -65,5 +69,19 @@ public class VoiceParticipant {
 
             Discord_VoiceStateHandle_Drop(voiceState);
         }
+    }
+
+    public float getVolume(MemorySegment call) {
+        return Discord_Call_GetParticipantVolume(call, userId);
+    }
+
+    public void setVolume(MemorySegment call, float volume) {
+        Discord_Call_SetParticipantVolume(call, userId, volume);
+    }
+
+    public PlayerSkin getSkin() {
+        PlayerSkinRenderCache skinCache = Minecraft.getInstance().playerSkinRenderCache();
+        PlayerSkinRenderCache.RenderInfo renderInfo = skinCache.getOrDefault(ResolvableProfile.createUnresolved(this.getProfile().id()));
+        return renderInfo.playerSkin();
     }
 }

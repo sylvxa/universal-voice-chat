@@ -1,8 +1,7 @@
-package lol.sylvie.universalvc.screen;
+package lol.sylvie.universalvc.screen.util;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.LoadingDotsWidget;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;

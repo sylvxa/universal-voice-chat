@@ -1,8 +1,9 @@
 package lol.sylvie.universalvc.screen.quick;
 
 import lol.sylvie.universalvc.UniversalVoiceChat;
-import lol.sylvie.universalvc.screen.ImageBackedScreen;
-import lol.sylvie.universalvc.screen.LoadingScreen;
+import lol.sylvie.universalvc.screen.manage.LobbyManageScreen;
+import lol.sylvie.universalvc.screen.util.ImageBackedScreen;
+import lol.sylvie.universalvc.screen.util.LoadingScreen;
 import lol.sylvie.universalvc.screen.settings.VoiceSettingsScreen;
 import lol.sylvie.universalvc.screen.setup.SetupScreen;
 import lol.sylvie.universalvc.util.ModIcons;
@@ -35,8 +36,17 @@ public class QuickMenuScreen extends ImageBackedScreen {
 
     private void loadCallback(Result result) {
         minecraft.execute(() -> {
-            minecraft.gui.setScreen(new QuickMenuScreen());
+            Screen screen = minecraft.gui.screen();
+            if (screen instanceof LoadingScreen | screen instanceof QuickMenuScreen) minecraft.gui.setScreen(new QuickMenuScreen());
         });
+    }
+
+    public static void refresh() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.gui.screen() instanceof QuickMenuScreen) // refresh
+            minecraft.gui.setScreen(new QuickMenuScreen());
+        else if (minecraft.gui.screen() instanceof LobbyManageScreen)
+            LobbyManageScreen.refresh();
     }
 
     @Override
@@ -55,15 +65,11 @@ public class QuickMenuScreen extends ImageBackedScreen {
             addRenderableWidget(title);
             addRenderableWidget(status);
 
-            Button editButton = Button.builder(Component.translatable("menu.uvc.edit"), _ -> {
-                System.out.println("EDIT");
+            Button manageButton = Button.builder(Component.translatable("menu.uvc.manage"), _ -> {
+                minecraft.gui.setScreen(new LobbyManageScreen());
             }).bounds(lobbyX, this.guiY + 40, 108, 14).build();
 
-            // TODO: REPLACE
-            editButton.active = false;
-            editButton.setTooltip(Tooltip.create(Component.translatable("text.uvc.coming_soon")));
-
-            addRenderableWidget(editButton);
+            addRenderableWidget(manageButton);
         } else {
             EditBox editBox = new EditBox(font, 107, 15, Component.translatable("menu.uvc.lobby.secret"));
             editBox.setPosition(lobbyX, lobbyY);
