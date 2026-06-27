@@ -5,17 +5,19 @@ import lol.sylvie.universalvc.UniversalVoiceChat;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class AudioFader {
     public static HashMap<UUID, Data> distances = new HashMap<>();
-    public static volatile boolean isInGame = false;
 
-    private static void setPanning(AbstractClientPlayer thisPlayer, AbstractClientPlayer otherPlayer, Data data) {
+    private static void setPanning(AbstractClientPlayer thisPlayer, Player otherPlayer, Data data) {
         // Panning
         double dx = otherPlayer.getX() - thisPlayer.getX();
         double dz = otherPlayer.getZ() - thisPlayer.getZ();
@@ -49,17 +51,25 @@ public class AudioFader {
 
     public static void init() {
         ClientTickEvents.END_LEVEL_TICK.register(level -> {
-            AbstractClientPlayer thisPlayer = Minecraft.getInstance().player;
-            if (thisPlayer == null) {
-                isInGame = false;
+            Minecraft minecraft = Minecraft.getInstance();
+            ClientPacketListener connection = minecraft.getConnection();
+            AbstractClientPlayer thisPlayer = minecraft.player;
+            if (thisPlayer == null || connection == null) {
                 return;
             }
-            isInGame = true;
 
-            for (AbstractClientPlayer player : level.players()) {
+            List<UUID> players = LobbyHandler.participantMap.values().stream().map(p -> p.getProfile().id()).toList();
+            for (UUID uuid : players) {
+                Player player = level.getPlayerByUUID(uuid);
                 if (player == thisPlayer) continue;
-                Data data = distances.computeIfAbsent(player.getUUID(), _ -> new Data());
-                setPanning(thisPlayer, player, data);
+
+                Data data = distances.computeIfAbsent(uuid, _ -> new Data());
+                if (player != null)
+                    setPanning(thisPlayer, player, data);
+                else {
+                    data.leftPan.set(0f);
+                    data.rightPan.set(0f);
+                }
             }
         });
 

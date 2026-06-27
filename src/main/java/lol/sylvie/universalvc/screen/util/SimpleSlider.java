@@ -6,10 +6,10 @@ import net.minecraft.network.chat.Component;
 import java.text.NumberFormat;
 
 public class SimpleSlider extends AbstractSliderButton {
-    private String key;
-    private double min;
-    private double max;
-    private NumberFormat formatter;
+    private final String key;
+    private final double min;
+    private final double max;
+    private final NumberFormat formatter;
     public SimpleSlider(int width, int height, String key, double min, double max, double initialValue, NumberFormat formatter) {
         super(0, 0, width, height, Component.empty(), (initialValue - min) / (max - min));
         this.key = key;

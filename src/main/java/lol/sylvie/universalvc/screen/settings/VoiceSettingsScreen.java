@@ -20,10 +20,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class VoiceSettingsScreen extends AbstractConfigurationScreen {
-    private List<AudioDevice> inputs;
-    private AudioDevice currentInput;
-    private List<AudioDevice> outputs;
-    private AudioDevice currentOutput;
+    private final List<AudioDevice> inputs;
+    private final AudioDevice currentInput;
+    private final List<AudioDevice> outputs;
+    private final AudioDevice currentOutput;
 
     protected VoiceSettingsScreen(List<AudioDevice> inputs, AudioDevice currentInput, List<AudioDevice> outputs, AudioDevice currentOutput) {
         super(Component.translatable("menu.uvc.settings.long"));

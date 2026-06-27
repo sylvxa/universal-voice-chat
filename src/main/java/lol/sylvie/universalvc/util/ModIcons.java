@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.player.PlayerSkin;
 
 public class ModIcons {
     public static final Identifier MUTED = UniversalVoiceChat.id("status/muted");
@@ -15,7 +14,6 @@ public class ModIcons {
     public static final Identifier UNDEAFENED = UniversalVoiceChat.id("status/undeafened");
 
     public static final Identifier EXIT = UniversalVoiceChat.id("action/exit");
-
 
     public static SpriteIconButton getMenuButton(Screen previous) {
         return SpriteIconButton.builder(Component.translatable("uvc.name.short"), _ -> QuickMenuScreen.tryOpen(previous), true)

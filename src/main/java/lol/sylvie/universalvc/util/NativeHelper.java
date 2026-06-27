@@ -9,7 +9,6 @@ import lol.sylvie.universalvc.UniversalVoiceChat;
 import lol.sylvie.universalvc.sdk.AudioDevice;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -21,21 +20,16 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.discord.cdiscord_h.Discord_AudioDevice_Id;
-import static com.discord.cdiscord_h.Discord_AudioDevice_Name;
-
 public class NativeHelper {
     private static Path copyResourceDirToTemp(String resourcePath) {
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             URL url = classLoader.getResource(resourcePath);
-            if (url == null) {
-                throw new IOException("Resource directory not found on classpath: " + resourcePath);
-            }
+            if (url == null)
+                throw new IOException("Couldn't find path: " + resourcePath);
 
             Path tempDir = Files.createTempDirectory("uvc-");
             URI uri = url.toURI();
-
             if (uri.getScheme().equals("jar")) {
                 try (FileSystem jarFs = FileSystems.newFileSystem(uri, Map.of())) {
                     Path source = jarFs.getPath(resourcePath);
@@ -65,11 +59,9 @@ public class NativeHelper {
                         Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
                     }
                 } catch (IOException e) {
-                    throw new UncheckedIOException(e);
+                    throw new RuntimeException(e);
                 }
             });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
         }
     }
 

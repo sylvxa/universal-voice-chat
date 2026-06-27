@@ -7,7 +7,9 @@ import lol.sylvie.universalvc.voice.VoiceParticipant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerFaceExtractor;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,8 +29,14 @@ public class VoiceChatOverlay {
                 .sorted(Comparator.comparing((v) -> v.getValue().getProfile().name()))
                 .map(Map.Entry::getValue)
                 .toList();
+
+        ClientPacketListener connection = Minecraft.getInstance().getConnection();
         for (VoiceParticipant participant : sortedParticipants) {
-            PlayerFaceExtractor.extractRenderState(graphics, participant.getSkin(), x, y, SKIN_SIZE, participant.isSpeaking() ? 0xFFFFFFFF : 0xFF909090);
+            boolean isInGame = connection == null || connection.getOnlinePlayerIds().contains(participant.getProfile().id());
+            PlayerFaceExtractor.extractRenderState(graphics, participant.getSkin(), x, y, SKIN_SIZE, participant.isSpeaking() && isInGame ? 0xFFFFFFFF : 0xFF909090);
+            if (!isInGame) {
+                graphics.blit(Identifier.withDefaultNamespace("textures/item/barrier.png"), x, y, x + SKIN_SIZE, y + SKIN_SIZE, 0f, 1f, 0f, 1f);
+            }
 
             if (participant.isDeafened() || participant.isMuted()) {
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, participant.isDeafened() ? ModIcons.DEAFENED : ModIcons.MUTED, x + SKIN_SIZE - ICON_SIZE + 2, y + SKIN_SIZE - ICON_SIZE + 2, 16, 16);

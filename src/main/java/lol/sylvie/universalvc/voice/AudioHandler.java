@@ -2,6 +2,7 @@ package lol.sylvie.universalvc.voice;
 
 import com.discord.Discord_Client_UserAudioReceivedCallback;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.client.Minecraft;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -11,12 +12,18 @@ import static lol.sylvie.universalvc.voice.LobbyHandler.participantMap;
 public class AudioHandler implements Discord_Client_UserAudioReceivedCallback.Function {
     @Override
     public void apply(long userId, MemorySegment data, long samplesPerChannel, int sampleRate, long channels, MemorySegment outShouldMute, MemorySegment userData) {
-        if (!AudioFader.isInGame || channels != 2) return;
+        if (Minecraft.getInstance().getConnection() == null) {
+            return;
+        }
+
+        if (channels != 2) return;
 
         long totalSamples = samplesPerChannel * channels;
         MemorySegment audioBuffer = data.reinterpret(totalSamples * ValueLayout.JAVA_SHORT.byteSize());
 
-        GameProfile gameProfile = participantMap.get(userId).getProfile();
+        VoiceParticipant participant = participantMap.get(userId);
+        if (participant == null) return;
+        GameProfile gameProfile = participant.getProfile();
         AudioFader.Data panData = AudioFader.distances.get(gameProfile.id());
         if (panData == null) return;
 

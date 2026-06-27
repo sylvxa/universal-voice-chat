@@ -10,7 +10,7 @@ import java.lang.foreign.MemorySegment;
 import java.util.List;
 
 public class LoggingHandler implements Discord_Client_LogCallback.Function {
-    private static List<Level> SEVERITIES = List.of(
+    private static final List<Level> SEVERITIES = List.of(
             Level.DEBUG, // "Verbose",
             Level.INFO,  // "Info",
             Level.WARN,  // "Warning",

@@ -94,17 +94,20 @@ public class LobbyHandler {
                 }
 
                 // Callbacks
-                Discord_Client_LobbyMemberAddedCallback.Function function = (_, memberId, _) -> {
+                Discord_Client_LobbyMemberAddedCallback.Function addedFunction = (_, memberId, _) -> {
                     MemorySegment member = Discord_LobbyMemberHandle.allocate(arena);
                     Discord_LobbyHandle_GetLobbyMemberHandle(lobbyHandle, memberId, member);
                     addMember(member);
+                    QuickMenuScreen.refresh();
                 };
-                Discord_Client_SetLobbyMemberAddedCallback(client, Discord_Client_LobbyMemberAddedCallback.allocate(function, arena), MemorySegment.NULL, MemorySegment.NULL);
+                Discord_Client_SetLobbyMemberAddedCallback(client, Discord_Client_LobbyMemberAddedCallback.allocate(addedFunction, arena), MemorySegment.NULL, MemorySegment.NULL);
 
-                Discord_Client_SetLobbyMemberRemovedCallback(client, Discord_Client_LobbyMemberRemovedCallback.allocate((_, memberId, _) -> {
+                Discord_Client_LobbyMemberRemovedCallback.Function removedFunction = (_, memberId, _) -> {
                     Discord_LobbyMemberHandle_Drop(participantMap.get(memberId).getHandle());
                     participantMap.remove(memberId);
-                }, arena), MemorySegment.NULL, MemorySegment.NULL);
+                    QuickMenuScreen.refresh();
+                };
+                Discord_Client_SetLobbyMemberRemovedCallback(client, Discord_Client_LobbyMemberRemovedCallback.allocate(removedFunction, arena), MemorySegment.NULL, MemorySegment.NULL);
 
                 // Voice state updates
                 Discord_Call_SetSpeakingStatusChangedCallback(call, Discord_Call_OnSpeakingStatusChanged.allocate((userId, isPlayingSound, _) -> {
