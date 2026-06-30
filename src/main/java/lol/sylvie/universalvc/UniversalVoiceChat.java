@@ -1,6 +1,7 @@
 package lol.sylvie.universalvc;
 
 import lol.sylvie.universalvc.command.VoiceChatCommand;
+import lol.sylvie.universalvc.render.EntityRenderer;
 import lol.sylvie.universalvc.screen.settings.ModSettings;
 import lol.sylvie.universalvc.sdk.DiscordHandler;
 import lol.sylvie.universalvc.voice.AudioFader;
@@ -55,6 +56,7 @@ public class UniversalVoiceChat implements ClientModInitializer {
 		AudioFader.init();
 		VoiceChatCommand.init();
 		VoiceKeybinds.init();
+		EntityRenderer.init();
 
 		ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> {
             if (DISCORD_HANDLER != null) {
