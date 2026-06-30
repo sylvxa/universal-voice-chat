@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,12 +32,12 @@ public class AvatarRendererMixin {
     @Unique
     private static final int ICON_SIZE = 8;
 
-    private static void uvc$textureVertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float u, float v) {
+    private static void uvc$textureVertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float u, float v, int alpha, int lightCoords) {
         buffer.addVertex(pose.pose(), x, y, 0)
-                .setColor(255, 255, 255, 255)
+                .setColor(255, 255, 255, alpha)
                 .setUv(u, v)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(255)
+                .setLight(lightCoords)
                 .setNormal(pose, 0F, 0F, -1F);
     }
 
@@ -45,7 +46,7 @@ public class AvatarRendererMixin {
             at = @At("TAIL"))
     public void uvc$submitVoiceIndicator(AvatarRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, CallbackInfo ci) {
         Vec3 nameTagAttachment = state.nameTagAttachment;
-        if (nameTagAttachment == null || UniversalVoiceChat.MOD_SETTINGS.nametagIndicators) return;
+        if (nameTagAttachment == null || !UniversalVoiceChat.MOD_SETTINGS.nametagIndicators) return;
 
         Minecraft minecraft = Minecraft.getInstance();
         Entity entity = minecraft.level.getEntity(state.id);
@@ -68,11 +69,13 @@ public class AvatarRendererMixin {
         poseStack.mulPose(camera.orientation);
         poseStack.scale(0.025F, -0.025F, 0.025F);
 
+        int alpha = state.isDiscrete ? 127 : 255;
+        int light = LightCoordsUtil.lightCoordsWithEmission(state.lightCoords, 2);
         submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.text(sprite.atlasLocation()), (pose, buffer) -> {
-            uvc$textureVertex(buffer, pose, -ICON_SIZE, ICON_SIZE, sprite.getU0(), sprite.getV1());
-            uvc$textureVertex(buffer, pose, ICON_SIZE, ICON_SIZE, sprite.getU1(), sprite.getV1());
-            uvc$textureVertex(buffer, pose, ICON_SIZE, -ICON_SIZE, sprite.getU1(), sprite.getV0());
-            uvc$textureVertex(buffer, pose, -ICON_SIZE, -ICON_SIZE, sprite.getU0(), sprite.getV0());
+            uvc$textureVertex(buffer, pose, -ICON_SIZE, ICON_SIZE, sprite.getU0(), sprite.getV1(), alpha, light);
+            uvc$textureVertex(buffer, pose, ICON_SIZE, ICON_SIZE, sprite.getU1(), sprite.getV1(), alpha, light);
+            uvc$textureVertex(buffer, pose, ICON_SIZE, -ICON_SIZE, sprite.getU1(), sprite.getV0(), alpha, light);
+            uvc$textureVertex(buffer, pose, -ICON_SIZE, -ICON_SIZE, sprite.getU0(), sprite.getV0(), alpha, light);
         });
 
         poseStack.popPose();
