@@ -14,22 +14,6 @@ public class VoiceKeybinds {
                 UniversalVoiceChat.id("keys")
         );
 
-        KeyMapping muteKey = KeyMappingHelper.registerKeyMapping(
-                new KeyMapping(
-                        "key.universalvc.mute",
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_M,
-                        CATEGORY
-                ));
-
-        KeyMapping deafenKey = KeyMappingHelper.registerKeyMapping(
-                new KeyMapping(
-                        "key.universalvc.deafen",
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_N,
-                        CATEGORY
-                ));
-
         KeyMapping menuKey = KeyMappingHelper.registerKeyMapping(
                 new KeyMapping(
                         "key.universalvc.menu",
@@ -38,17 +22,33 @@ public class VoiceKeybinds {
                         CATEGORY
                 ));
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        KeyMapping muteKey = KeyMappingHelper.registerKeyMapping(
+                new KeyMapping(
+                        "text.uvc.mute",
+                        InputConstants.Type.KEYSYM,
+                        GLFW.GLFW_KEY_M,
+                        CATEGORY
+                ));
+
+        KeyMapping deafenKey = KeyMappingHelper.registerKeyMapping(
+                new KeyMapping(
+                        "text.uvc.deaf",
+                        InputConstants.Type.KEYSYM,
+                        GLFW.GLFW_KEY_N,
+                        CATEGORY
+                ));
+
+        ClientTickEvents.END_CLIENT_TICK.register(_ -> {
+            while (menuKey.consumeClick()) {
+                QuickMenuScreen.tryOpen(null);
+            }
+
             while (muteKey.consumeClick()) {
                 LobbyHandler.toggleMute();
             }
 
             while (deafenKey.consumeClick()) {
                 LobbyHandler.toggleDeafen();
-            }
-
-            while (menuKey.consumeClick()) {
-                QuickMenuScreen.tryOpen(null);
             }
         });
     }

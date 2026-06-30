@@ -125,10 +125,8 @@ public class DiscordHandler {
 
         // Setup callbacks
         Discord_Client_OnStatusChanged.Function statusCallback = (status, error, _, _) -> {
-            MemorySegment statusStrSeg = arena.allocate(Discord_String.layout());
-            Discord_Client_StatusToString(status, statusStrSeg);
-
             if (status == Discord_Client_Status_Ready()) {
+                if (this.isReady()) return;
                 MemorySegment handle = Discord_UserHandle.allocate(arena);
                 Discord_Client_GetCurrentUser(client, handle);
                 userId = Discord_UserHandle_Id(handle);

@@ -39,9 +39,11 @@
   "text.uvc.leaving": "Leaving lobby...",
   "text.uvc.joining": "Joining lobby...",
 
+  "key.category.universalvc.keys": "Universal Voice Chat",
   "text.uvc.mute": "Toggle Mute",
   "text.uvc.deaf": "Toggle Deafen",
   "text.uvc.exit": "Leave Lobby",
+  "key.universalvc.menu": "Open Menu",
 
   "text.uvc.coming_soon": "coming soon ;|",
 
