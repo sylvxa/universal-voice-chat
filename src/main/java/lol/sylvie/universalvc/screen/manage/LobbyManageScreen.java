@@ -7,9 +7,7 @@ import lol.sylvie.universalvc.screen.util.PlayerNameWidget;
 import lol.sylvie.universalvc.screen.util.SimpleSlider;
 import lol.sylvie.universalvc.voice.LobbyHandler;
 import lol.sylvie.universalvc.voice.VoiceParticipant;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -23,7 +21,7 @@ public class LobbyManageScreen extends AbstractConfigurationScreen {
 
     @Override
     protected void addSettings(LinearLayout settings, int width) {
-        for (VoiceParticipant participant : LobbyHandler.participantMap.values()) {
+        for (VoiceParticipant participant : LobbyHandler.discordIdMap.values()) {
             if (participant.getProfile().id().equals(Minecraft.getInstance().getGameProfile().id())) continue;
 
             GameProfile profile = participant.getProfile();

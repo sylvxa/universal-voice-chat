@@ -25,7 +25,7 @@ public class VoiceChatOverlay {
 
         int x = graphics.guiWidth() - SKIN_SIZE - MARGIN;
         int y = MARGIN;
-        List<VoiceParticipant> sortedParticipants = LobbyHandler.participantMap.entrySet().stream()
+        List<VoiceParticipant> sortedParticipants = LobbyHandler.discordIdMap.entrySet().stream()
                 .sorted(Comparator.comparing((v) -> v.getValue().getProfile().name()))
                 .map(Map.Entry::getValue)
                 .toList();

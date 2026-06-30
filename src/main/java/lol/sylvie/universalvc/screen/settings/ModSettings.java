@@ -14,6 +14,7 @@ public class ModSettings {
     public String applicationId = "";
     public boolean renderOverlay = true;
     public boolean overlayOnlyInMenus = true;
+    public boolean nametagIndicators = true;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File file = FabricLoader.getInstance().getConfigDir().resolve(UniversalVoiceChat.MOD_ID + ".json").toFile();

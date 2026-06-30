@@ -62,7 +62,7 @@ public class QuickMenuScreen extends ImageBackedScreen {
         boolean isInCall = LobbyHandler.call != null;
         if (isInCall) {
             StringWidget title = new StringWidget(lobbyX, lobbyY, 107, 9, Component.translatable("menu.uvc.lobby.title", LobbyHandler.secret).withStyle(ChatFormatting.WHITE), font);
-            int users = LobbyHandler.participantMap.size();
+            int users = LobbyHandler.discordIdMap.size();
             StringWidget status = new StringWidget(lobbyX, lobbyY + 10, 107, 9, Component.translatable("menu.uvc.lobby.status.connected", users, users == 1 ? "" : "s").withStyle(ChatFormatting.GRAY), font);
             addRenderableWidget(title);
             addRenderableWidget(status);
@@ -124,7 +124,6 @@ public class QuickMenuScreen extends ImageBackedScreen {
         return false;
     }
 
-    // client.gui.toastManager().addToast(new SystemToast(SystemToast.SystemToastId.CHUNK_LOAD_FAILURE, Component.translatable("error.uvc.not_ready"), null));
     private static void open() {
         Minecraft.getInstance().gui.setScreen(new QuickMenuScreen());
     }

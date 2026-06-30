@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-import static lol.sylvie.universalvc.voice.LobbyHandler.participantMap;
+import static lol.sylvie.universalvc.voice.LobbyHandler.discordIdMap;
 
 public class AudioHandler implements Discord_Client_UserAudioReceivedCallback.Function {
     @Override
@@ -21,7 +21,7 @@ public class AudioHandler implements Discord_Client_UserAudioReceivedCallback.Fu
         long totalSamples = samplesPerChannel * channels;
         MemorySegment audioBuffer = data.reinterpret(totalSamples * ValueLayout.JAVA_SHORT.byteSize());
 
-        VoiceParticipant participant = participantMap.get(userId);
+        VoiceParticipant participant = discordIdMap.get(userId);
         if (participant == null) return;
         GameProfile gameProfile = participant.getProfile();
         AudioFader.Data panData = AudioFader.distances.get(gameProfile.id());

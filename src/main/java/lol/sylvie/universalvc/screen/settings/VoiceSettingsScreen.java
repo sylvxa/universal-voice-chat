@@ -71,6 +71,7 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
 
     private CycleButton<Boolean> overlayToggle;
     private CycleButton<Boolean> inGameToggle;
+    private CycleButton<Boolean> nametagToggle;
     private EditBox appId;
 
     private boolean closing = false;
@@ -122,6 +123,13 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
         this.inGameToggle.active = UniversalVoiceChat.MOD_SETTINGS.renderOverlay;
         settings.addChild(this.inGameToggle);
 
+        this.nametagToggle = CycleButton.booleanBuilder(CommonComponents.OPTION_ON, CommonComponents.OPTION_OFF, UniversalVoiceChat.MOD_SETTINGS.nametagIndicators).create(
+                Component.translatable("menu.uvc.settings.nametag_indicators"),
+                (_, _) -> {}
+        );
+        this.nametagToggle.setWidth(width);
+        settings.addChild(this.nametagToggle);
+
         addHeader(settings, Component.translatable("menu.uvc.settings.discord"));
 
         settings.addChild(new StringWidget(Component.translatable("menu.uvc.settings.application_id"), font));
@@ -149,6 +157,7 @@ public class VoiceSettingsScreen extends AbstractConfigurationScreen {
 
         settings.renderOverlay = overlayToggle.getValue();
         settings.overlayOnlyInMenus = inGameToggle.getValue();
+        settings.nametagIndicators = nametagToggle.getValue();
 
         String newId = this.appId.getValue().strip();
         if (!newId.equals(settings.applicationId) && ModSettings.isLong(newId)) {

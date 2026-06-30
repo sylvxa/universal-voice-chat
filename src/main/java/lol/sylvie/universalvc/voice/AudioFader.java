@@ -58,7 +58,7 @@ public class AudioFader {
                 return;
             }
 
-            List<UUID> players = LobbyHandler.participantMap.values().stream().map(p -> p.getProfile().id()).toList();
+            List<UUID> players = LobbyHandler.discordIdMap.values().stream().map(p -> p.getProfile().id()).toList();
             for (UUID uuid : players) {
                 Player player = level.getPlayerByUUID(uuid);
                 if (player == thisPlayer) continue;

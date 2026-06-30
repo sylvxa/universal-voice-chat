@@ -28,7 +28,8 @@ public class LobbyHandler {
     public static MemorySegment call;
     private static MemorySegment lobbyHandle;
 
-    public static Map<Long, VoiceParticipant> participantMap = new HashMap<>();
+    public static Map<Long, VoiceParticipant> discordIdMap = new HashMap<>();
+    public static Map<UUID, VoiceParticipant> minecraftIdMap = new HashMap<>();
 
     private static void addMember(MemorySegment member) {
         Arena arena = UniversalVoiceChat.DISCORD_HANDLER.getArena();
@@ -40,7 +41,8 @@ public class LobbyHandler {
 
         GameProfile profile = new GameProfile(UUID.fromString(metadata.get("uuid")), metadata.get("name"));
         VoiceParticipant participant = new VoiceParticipant(profile, member, userId);
-        participantMap.put(userId, participant);
+        discordIdMap.put(userId, participant);
+        minecraftIdMap.put(profile.id(), participant);
 
         participant.updateVoiceState(call);
     }
@@ -103,20 +105,22 @@ public class LobbyHandler {
                 Discord_Client_SetLobbyMemberAddedCallback(client, Discord_Client_LobbyMemberAddedCallback.allocate(addedFunction, arena), MemorySegment.NULL, MemorySegment.NULL);
 
                 Discord_Client_LobbyMemberRemovedCallback.Function removedFunction = (_, memberId, _) -> {
-                    Discord_LobbyMemberHandle_Drop(participantMap.get(memberId).getHandle());
-                    participantMap.remove(memberId);
+                    VoiceParticipant participant = discordIdMap.get(memberId);
+                    minecraftIdMap.remove(participant.getProfile().id());
+                    Discord_LobbyMemberHandle_Drop(participant.getHandle());
+                    discordIdMap.remove(memberId);
                     QuickMenuScreen.refresh();
                 };
                 Discord_Client_SetLobbyMemberRemovedCallback(client, Discord_Client_LobbyMemberRemovedCallback.allocate(removedFunction, arena), MemorySegment.NULL, MemorySegment.NULL);
 
                 // Voice state updates
                 Discord_Call_SetSpeakingStatusChangedCallback(call, Discord_Call_OnSpeakingStatusChanged.allocate((userId, isPlayingSound, _) -> {
-                    VoiceParticipant participant = participantMap.get(userId);
+                    VoiceParticipant participant = discordIdMap.get(userId);
                     if (participant != null) participant.setSpeaking(isPlayingSound);
                 }, arena), MemorySegment.NULL, MemorySegment.NULL);
 
                 Discord_Call_SetOnVoiceStateChangedCallback(call, Discord_Call_OnVoiceStateChanged.allocate((userId, _) -> {
-                    VoiceParticipant participant = participantMap.get(userId);
+                    VoiceParticipant participant = discordIdMap.get(userId);
                     if (participant != null) participant.updateVoiceState(call);
                     if (userId == UniversalVoiceChat.DISCORD_HANDLER.getUserId())
                         QuickMenuScreen.refresh();
@@ -162,7 +166,8 @@ public class LobbyHandler {
         id = null;
         secret = null;
         call = null;
-        participantMap.clear();
+        discordIdMap.clear();
+        minecraftIdMap.clear();
 
         Discord_LobbyHandle_Drop(lobbyHandle);
         lobbyHandle = null;
